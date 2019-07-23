@@ -1,12 +1,29 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
-import App from './App';
-import * as serviceWorker from './serviceWorker';
+import Head from './Components/HeadComponent/head.js';
+import View from './Components/ViewComponent/view.js';
+import Row from './Components/RowComponent/row.js';
 
-ReactDOM.render(<App />, document.getElementById('root'));
+class MainComponent extends React.Component{
+    constructor(props){
+        super(props);
+    }
 
-// If you want your app to work offline and load faster, you can change
-// unregister() to register() below. Note this comes with some pitfalls.
-// Learn more about service workers: https://bit.ly/CRA-PWA
-serviceWorker.unregister();
+    render(){
+        return (this.props.component)      
+    }
+}
+
+mainComponent(
+    <View 
+        head={<Head />}
+    />
+);
+
+function mainComponent(component){
+    ReactDOM.render(
+        <MainComponent component={component} />,
+        document.getElementById('root')
+    );
+}
