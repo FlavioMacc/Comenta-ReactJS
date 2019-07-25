@@ -4,21 +4,21 @@ import React from 'react';
 class Row extends React.Component {
   constructor(props) {
     super(props);
-    this.articleChange = this.articleChange.bind(this);
-    this.lottoChange = this.lottoChange.bind(this);
-    this.quantityChange = this.quantityChange.bind(this);
+    //this.articleChange = this.articleChange.bind(this);
+    //this.lottoChange = this.lottoChange.bind(this);
+    //this.quantityChange = this.quantityChange.bind(this);
 
-    this.setValue = this.setValue.bind(this);
+    //this.setValue = this.setValue.bind(this);
 
     this.state = {
         index:this.props.index,
-        articolo: null,
-        lotto: null,
-        quantita: null,
+        articolo: this.props.articolo,
+        lotto: this.props.lotto,
+        quantita: this.props.quantita,
     };
   }
 
-  setValue(nameVariable,value){
+  /*setValue(nameVariable,value){
 
     const {index} = this.state;
     this.props.func(index,nameVariable,value);
@@ -37,13 +37,29 @@ class Row extends React.Component {
   quantityChange(event) {
     this.setState({ quantita: event.target.value });
     this.setValue("quantita",event.target.value);
-  }
+  }*/
 
   render() {
-    //const {row} = this.props;
-    
+    //const {func} = this.props;
+    const {articolo,lotto,quantita} = this.state;
     return (
       <>
+        <td>
+          codice Articolo:
+          <input type="text" name="articolo" value={articolo} readOnly/>
+        </td>
+        <td>
+          codice Lotto:
+          <input type="text" name="lotto" value={lotto} readOnly/>
+        </td>
+        <td>
+          quantita:
+          <input type="number" name="quantita" value={quantita} readOnly/>
+        </td>
+      </>
+      
+
+      /*<>
         <td>
           codice Articolo:
           <input type="text" name="articolo" onChange={this.articleChange} />
@@ -56,7 +72,7 @@ class Row extends React.Component {
           quantita:
           <input type="number" name="quantita" onChange={this.quantityChange} />
         </td>
-      </>
+      </>*/
     );
   }
 }
