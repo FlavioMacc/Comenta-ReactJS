@@ -2,6 +2,42 @@ import React from 'react';
 import './view.css';
 import Row from '../Row/index.js';
 import axios from 'axios';
+import Autosuggest from 'react-autosuggest';
+
+//======================================================
+ 
+  var articles = null;
+
+  //function getArticles(){
+    axios.get(`http://localhost:8080/getAllArticles`).then(res => {
+      articles =  res.data;
+    });
+  //}
+
+// Teach Autosuggest how to calculate suggestions for any given input value.
+const getSuggestions = value => {
+  const inputValue = value.trim().toLowerCase();
+  const inputLength = inputValue.length;
+
+  return inputLength === 0 ? [] : articles.filter(lang =>
+    lang.codice.toLowerCase().slice(0, inputLength) === inputValue
+  );
+};
+
+// When suggestion is clicked, Autosuggest needs to populate the input
+// based on the clicked suggestion. Teach Autosuggest how to calculate the
+// input value for every given suggestion.
+const getSuggestionValue = suggestion => suggestion.codice;
+
+// Use your imagination to render suggestions.
+const renderSuggestion = suggestion => (
+  <div>
+    {suggestion.codice}
+  </div>
+);
+
+//======================================================
+
 
 
 class Main extends React.Component {
@@ -25,6 +61,9 @@ class Main extends React.Component {
       lotto:'',
       quantita:'',
 
+      value: '',
+      suggestions: []
+
     };
   }
 
@@ -34,6 +73,31 @@ class Main extends React.Component {
       this.setState({ progressNumber });
     });
   }
+
+//========================================
+
+  onChange = (event, { newValue }) => {
+    this.setState({
+      value: newValue,
+      articolo: newValue
+    });
+  };
+
+  // Autosuggest will call this function every time you need to update suggestions.
+  // You already implemented this logic above, so just use it.
+  onSuggestionsFetchRequested = ({ value }) => {
+    this.setState({
+      suggestions: getSuggestions(value)
+    });
+  };
+
+  // Autosuggest will call this function every time you need to clear suggestions.
+  onSuggestionsClearRequested = () => {
+    this.setState({
+      suggestions: []
+    });
+  };
+  //========================================
 
   /*addRow() {
     const {rows} = this.state;
@@ -87,26 +151,25 @@ class Main extends React.Component {
     const {rows,selectValue,articolo,lotto,quantita} = this.state;
 
     if(articolo!= '' && lotto!= '' && quantita!= ''){
-    var row ={idArticolo:articolo , idLotto:lotto , quantita:quantita};
-    var json=JSON.stringify(row);
+      var row ={idArticolo:articolo , idLotto:lotto , quantita:quantita};
+      var json=JSON.stringify(row);
 
-    axios.post('http://localhost:8080/checkRow?codice='+selectValue,json,{headers: {'Content-Type': 'application/json'}})
-      .then(response => { 
+      axios.post('http://localhost:8080/checkRow?codice='+selectValue,json,{headers: {'Content-Type': 'application/json'}})
+        .then(response => { 
 
-        const message = response.data;
+          const message = response.data;
 
-        if(message == "ok"){
-          alert(message);
-          rows.push({idArticolo:articolo , idLotto:lotto , quantita:quantita});
-          this.setState({rows});
-          this.resetValueRow();
-        }else{
-          alert(message);
-        }
+          if(message == "ok"){
+            rows.push({idArticolo:articolo , idLotto:lotto , quantita:quantita});
+            this.setState({rows});
+            this.resetValueRow();
+          }else{
+            alert(message);
+          }
 
-        console.log(response);
-      });
-  }else{alert("Valori Mancanti")}
+          console.log(response);
+        });
+    }else{alert("Valori Mancanti")}
   }
   
   handleChange(event) {
@@ -135,17 +198,27 @@ class Main extends React.Component {
   }
 
   resetValueRow(){
-    this.setState({articolo:'' , lotto:'' , quantita:''});
+    this.setState({articolo:'' , lotto:'' , quantita:'',value:''});
   }
 
   deleteRow(index){
-    alert("un giorno cacnellero la riga ->"+(index+1));
+    this.setState({
+      rows: this.state.rows.filter((_, i) => i !== index)
+      //rows: rows.slice(0, index).concat(rows.slice(index + 1, rows.length))
+    });
   }
 
 
   render() {
     const { head } = this.props;
-    const { selectValue, progressNumber, rows,articolo,lotto,quantita} = this.state;
+    const { selectValue, progressNumber, rows,articolo,lotto,quantita,value, suggestions} = this.state;
+
+    // Autosuggest will pass through all these props to the input.
+    const inputProps = {
+      placeholder: 'Codice Articolo',
+      value,
+      onChange: this.onChange
+    };
 
     return (
       <div className="view">
@@ -177,13 +250,24 @@ class Main extends React.Component {
               </td>
             </tr>
             <tr className="exampleRow">
-              <td>codice Articolo:<input type="text" name="articolo" value={articolo} onChange={(e)=>this.valueChange(e,"articolo")}/></td>
-              <td>codice Lotto:<input type="text" name="lotto" value={lotto} onChange={(e)=>this.valueChange(e,"lotto")}/></td>
-              <td>quantita:<input type="number" name="quantita" value={quantita} onChange={(e)=>this.valueChange(e,"quantita")}/></td>
+              <td><Autosuggest
+                                    suggestions={suggestions}
+                                    onSuggestionsFetchRequested={this.onSuggestionsFetchRequested}
+                                    onSuggestionsClearRequested={this.onSuggestionsClearRequested}
+                                    getSuggestionValue={getSuggestionValue}
+                                    renderSuggestion={renderSuggestion}
+                                    inputProps={inputProps} 
+                                    />
+              </td>
+              <td><input type="text" placeholder="codice Lotto" name="lotto" value={lotto} onChange={(e)=>this.valueChange(e,"lotto")}/></td>
+              <td><input type="number" placeholder="quantita" name="quantita" value={quantita} onChange={(e)=>this.valueChange(e,"quantita")}/></td>
               <td><button type="button" onClick={this.checkRow}>Aggiungi Riga</button></td>
             </tr>
             {rows.map((row, index) => (
               /*<tr>
+                <td>codice Articolo:<input type="text" name="articolo" value={articolo} onChange={(e)=>this.valueChange(e,"articolo")}/></td>
+
+
                 <Row index={index} func={this.onChange}/>
               </tr>*/
             <tr>
@@ -193,8 +277,8 @@ class Main extends React.Component {
             ))}
           </table>
           <br />
-          <input type="submit" value="INVIA" onClick={this.submit} />
         </div>
+        <input type="submit" value="INVIA" className="sendButton" onClick={this.submit} />
       </div>
     );
   }
