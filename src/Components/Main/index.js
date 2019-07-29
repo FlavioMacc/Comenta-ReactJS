@@ -3,16 +3,14 @@ import './view.css';
 import Row from '../Row/index.js';
 import axios from 'axios';
 import Autosuggest from 'react-autosuggest';
+import Calendar from 'react-calendar';
 
 //======================================================
- 
   var articles = null;
 
-  //function getArticles(){
-    axios.get(`http://localhost:8080/getAllArticles`).then(res => {
-      articles =  res.data;
-    });
-  //}
+  axios.get(`http://localhost:8080/getAllArticles`).then(res => {
+    articles =  res.data;
+  });
 
 // Teach Autosuggest how to calculate suggestions for any given input value.
 const getSuggestions = value => {
@@ -35,11 +33,7 @@ const renderSuggestion = suggestion => (
     {suggestion.codice}
   </div>
 );
-
 //======================================================
-
-
-
 class Main extends React.Component {
   constructor(props) {
     super(props);
@@ -55,7 +49,7 @@ class Main extends React.Component {
       rows: [],
       progressNumber: null,
       selectValue: 'fattura',
-      data: null,
+      data: new Date(),
 
       articolo:'',
       lotto:'',
@@ -75,6 +69,8 @@ class Main extends React.Component {
   }
 
 //========================================
+
+  onChange2 = date => this.setState({ date }) 
 
   onChange = (event, { newValue }) => {
     this.setState({
@@ -98,45 +94,6 @@ class Main extends React.Component {
     });
   };
   //========================================
-
-  /*addRow() {
-    const {rows} = this.state;
-
-    rows.push({ idArticolo:null , idLotto:null , quantita:null });
-    this.setState({rows});
-  }*/
-
-  /*onChange(index,nameVariable,value){
-    const {rows} = this.state;
-
-    var oldRow = rows[index];
-    var row=null;
-
-    switch(nameVariable){
-      case "articolo":
-          row = [{ idArticolo:value , idLotto:oldRow['idLotto'] , quantita:oldRow['quantita'] }];
-        break;
-
-      case "lotto":
-          row = [{ idArticolo:oldRow['idArticolo'] , idLotto:value , quantita:oldRow['quantita'] }];
-        break;
-
-      case "quantita":
-          row = [{ idArticolo:oldRow['idArticolo'] , idLotto:oldRow['idLotto'] , quantita:value }];
-        break;
-
-      default:
-        break;
-    }
-
-    //alert("old "+oldRow['idArticolo']+" "+oldRow['idLotto']+" "+oldRow['quantita']);
-    //alert("new "+row[0]['idArticolo']+" "+row[0]['idLotto']+" "+row[0]['quantita']);
-
-    rows[index]=row[0];
-
-    this.setState(rows);
-  }*/
-
   sentToDB() {
     const { rows, selectValue,data } = this.state;
     var json=JSON.stringify(rows);
@@ -178,7 +135,7 @@ class Main extends React.Component {
   }
 
   dataChange(event){
-    this.setState({ data: event.target.value });
+    this.setState({data: event.target.value});
   }
 
   submit() {
@@ -220,6 +177,8 @@ class Main extends React.Component {
       onChange: this.onChange
     };
 
+    //
+
     return (
       <div className="view">
         <div className="head">
@@ -231,7 +190,6 @@ class Main extends React.Component {
             <tr>
               <td>
                 <select
-                  name="codice"
                   value={selectValue}
                   onChange={this.handleChange}
                 >
@@ -242,43 +200,42 @@ class Main extends React.Component {
                 </select>
               </td>
               <td>
-                Numero Progressivo:
-                <input type="text" value={progressNumber} name="progressivo" readOnly />
+                <input type="text" value={"Numero Progressivo: "+progressNumber} className="input" placeholder="codice Lotto" readOnly />
               </td>
               <td>
-                data: <input type="text" name="data"  onChange={this.dataChange}/>
+                <div className="calendar">
+                  <p><Calendar onChange={this.onChange2} value={this.state.date}/></p>
+                  <input type="text" className="input" placeholder="Data yyyy/mm/gg" onChange={this.dataChange}/>
+                  <img src={require('./calendar.png')} onClick={this.showCalendar}/>
+                </div>
               </td>
             </tr>
             <tr className="exampleRow">
               <td><Autosuggest
-                                    suggestions={suggestions}
-                                    onSuggestionsFetchRequested={this.onSuggestionsFetchRequested}
-                                    onSuggestionsClearRequested={this.onSuggestionsClearRequested}
-                                    getSuggestionValue={getSuggestionValue}
-                                    renderSuggestion={renderSuggestion}
-                                    inputProps={inputProps} 
-                                    />
+                    suggestions={suggestions}
+                    onSuggestionsFetchRequested={this.onSuggestionsFetchRequested}
+                    onSuggestionsClearRequested={this.onSuggestionsClearRequested}
+                    getSuggestionValue={getSuggestionValue}
+                    renderSuggestion={renderSuggestion}
+                    inputProps={inputProps} 
+                  />
               </td>
-              <td><input type="text" placeholder="codice Lotto" name="lotto" value={lotto} onChange={(e)=>this.valueChange(e,"lotto")}/></td>
-              <td><input type="number" placeholder="quantita" name="quantita" value={quantita} onChange={(e)=>this.valueChange(e,"quantita")}/></td>
-              <td><button type="button" onClick={this.checkRow}>Aggiungi Riga</button></td>
+              <td><input type="text" placeholder="codice Lotto" className="input" value={lotto} onChange={(e)=>this.valueChange(e,"lotto")}/></td>
+              <td><input type="number" placeholder="quantita" className="input" value={quantita} onChange={(e)=>this.valueChange(e,"quantita")}/></td>
+              <td><button type="button" className="Button" onClick={this.checkRow}>Aggiungi Riga</button></td>
             </tr>
             {rows.map((row, index) => (
-              /*<tr>
-                <td>codice Articolo:<input type="text" name="articolo" value={articolo} onChange={(e)=>this.valueChange(e,"articolo")}/></td>
-
-
-                <Row index={index} func={this.onChange}/>
-              </tr>*/
-            <tr>
+            <tr className="rows">
                <Row index={index} articolo={articolo} lotto={lotto} quantita={quantita} />
-               <td><button onClick={() =>this.deleteRow(index)}>Elimina Riga</button></td>
+               <td><button className="Button" onClick={() =>this.deleteRow(index)}>Elimina Riga</button></td>
             </tr>
             ))}
           </table>
           <br />
         </div>
-        <input type="submit" value="INVIA" className="sendButton" onClick={this.submit} />
+        <div className="footer">
+          <input type="submit" value="INVIA" className="Button" onClick={this.submit} />
+        </div>
       </div>
     );
   }
