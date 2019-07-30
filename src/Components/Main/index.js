@@ -40,23 +40,28 @@ class Main extends React.Component {
 
     this.checkRow = this.checkRow.bind(this);
     this.dataChange = this.dataChange.bind(this);
+    this.showHideCalendar = this.showHideCalendar.bind(this);
     this.resetValueRow = this.resetValueRow.bind(this);
     this.valueChange = this.valueChange.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.submit = this.submit.bind(this);
 
+    /*const DATE_OPTIONS = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' };
+    (new Date()).toLocaleDateString( window.userLang , DATE_OPTIONS )*/
+    const DATE_OPTIONS = {day: 'numeric', month: 'numeric', year: 'numeric'};
     this.state = {
       rows: [],
       progressNumber: null,
       selectValue: 'fattura',
-      data: new Date(),
+      data: (new Date()).toLocaleDateString( window.userLang , DATE_OPTIONS ),
 
       articolo:'',
       lotto:'',
       quantita:'',
 
       value: '',
-      suggestions: []
+      suggestions: [],
+      cssCalendar: 'hideCalendar'
 
     };
   }
@@ -70,7 +75,10 @@ class Main extends React.Component {
 
 //========================================
 
-  onChange2 = date => this.setState({ date }) 
+  onChange2 = date => {
+    const DATE_OPTIONS = {day: 'numeric', month: 'numeric', year: 'numeric'};
+    this.setState({ data:date.toLocaleDateString( window.userLang , DATE_OPTIONS ) })
+  } 
 
   onChange = (event, { newValue }) => {
     this.setState({
@@ -97,11 +105,14 @@ class Main extends React.Component {
   sentToDB() {
     const { rows, selectValue,data } = this.state;
     var json=JSON.stringify(rows);
-
-    axios.post('http://localhost:8080/insertDocument?codice='+selectValue+'&data='+data,json,{headers: {'Content-Type': 'application/json',}})
-      .then(response => {
-        console.log(response);
-      });
+    if(rows.length > 0){
+      axios.post('http://localhost:8080/insertDocument?codice='+selectValue+'&data='+data,json,{headers: {'Content-Type': 'application/json',}})
+        .then(response => {
+          console.log(response);
+        });
+    }else{
+      alert("non ci sono dati da inviare");
+    }
   }
 
   checkRow(){
@@ -165,10 +176,19 @@ class Main extends React.Component {
     });
   }
 
+  showHideCalendar(){
+    const {cssCalendar} = this.state
+    if(cssCalendar == 'hideCalendar'){
+      this.setState({cssCalendar:'showCalendar'});
+    }else if(cssCalendar == 'showCalendar'){
+      this.setState({cssCalendar:'hideCalendar'});
+    }
+  }
+
 
   render() {
     const { head } = this.props;
-    const { selectValue, progressNumber, rows,articolo,lotto,quantita,value, suggestions} = this.state;
+    const { selectValue, progressNumber, rows,articolo,lotto,quantita,value, suggestions,cssCalendar,data} = this.state;
 
     // Autosuggest will pass through all these props to the input.
     const inputProps = {
@@ -204,10 +224,13 @@ class Main extends React.Component {
               </td>
               <td>
                 <div className="calendar">
-                  <p><Calendar onChange={this.onChange2} value={this.state.date}/></p>
-                  <input type="text" className="input" placeholder="Data yyyy/mm/gg" onChange={this.dataChange}/>
-                  <img src={require('./calendar.png')} onClick={this.showCalendar}/>
+                  <p className={cssCalendar}><Calendar onChange={this.onChange2} value={this.state.date}/></p>
+                  <input type="text" className="input" placeholder="Data yyyy/mm/gg" value={data} onChange={this.dataChange}/>
+                  <img src={require('./calendar.png')} onClick={this.showHideCalendar}/>
                 </div>
+              </td>
+              <td>
+                
               </td>
             </tr>
             <tr className="exampleRow">
