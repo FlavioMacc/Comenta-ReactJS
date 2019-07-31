@@ -4,6 +4,7 @@ import Row from '../Row/index.js';
 import axios from 'axios';
 import Autosuggest from 'react-autosuggest';
 import Calendar from 'react-calendar';
+import { connect } from "react-redux";
 
 //======================================================
   var articles = null;
@@ -40,6 +41,7 @@ class Main extends React.Component {
 
     this.checkRow = this.checkRow.bind(this);
     this.dataChange = this.dataChange.bind(this);
+    this.resechLottoCode = this.resechLottoCode.bind(this);
     this.showHideCalendar = this.showHideCalendar.bind(this);
     this.resetValueRow = this.resetValueRow.bind(this);
     this.valueChange = this.valueChange.bind(this);
@@ -75,6 +77,20 @@ class Main extends React.Component {
 
 //========================================
 
+  resechLottoCode(articoloCode){
+    var lottoCode=null;
+    var idArticolo=null;
+
+    axios.get(`http://localhost:8080/getIdArticleForCode`,{ params: { codice: articoloCode } })
+    .then(res => { idArticolo = res.data });
+
+    axios.get(`http://localhost:8080/getCodeLottoForIdArticle?idArticle=`+idArticolo)
+    .then(res => { lottoCode = res.data });
+
+    alert("lotto code->"+lottoCode);
+    return lottoCode;
+  }
+
   onChange2 = date => {
     const DATE_OPTIONS = {day: 'numeric', month: 'numeric', year: 'numeric'};
     this.setState({ data:date.toLocaleDateString( window.userLang , DATE_OPTIONS ) })
@@ -83,7 +99,8 @@ class Main extends React.Component {
   onChange = (event, { newValue }) => {
     this.setState({
       value: newValue,
-      articolo: newValue
+      articolo: newValue,
+      //lotto: this.resechLottoCode(newValue)
     });
   };
 
@@ -188,7 +205,9 @@ class Main extends React.Component {
 
   render() {
     const { head } = this.props;
-    const { selectValue, progressNumber, rows,articolo,lotto,quantita,value, suggestions,cssCalendar,data} = this.state;
+    const { selectValue, progressNumber,rows,articolo,lotto,quantita,value, suggestions,cssCalendar,data} = this.state;
+    //const {rows} = this.props;
+    console.log(this.props);
 
     // Autosuggest will pass through all these props to the input.
     const inputProps = {
@@ -264,4 +283,10 @@ class Main extends React.Component {
   }
 }
 
-export default Main;
+const mapStateToProps = (state) => {
+  return {
+    rows: state.rows
+  }
+}
+
+export default connect (mapStateToProps)(Main);
