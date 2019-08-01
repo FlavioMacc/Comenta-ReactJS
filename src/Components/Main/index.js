@@ -52,9 +52,9 @@ class Main extends React.Component {
     (new Date()).toLocaleDateString( window.userLang , DATE_OPTIONS )*/
     const DATE_OPTIONS = {day: 'numeric', month: 'numeric', year: 'numeric'};
     this.state = {
-      rows: [],
-      progressNumber: null,
-      selectValue: 'fattura',
+      //rows: [],
+      //progressNumber: null,
+      //selectValue: 'fattura',
       data: (new Date()).toLocaleDateString( window.userLang , DATE_OPTIONS ),
 
       articolo:'',
@@ -71,7 +71,9 @@ class Main extends React.Component {
   componentDidMount() {
     axios.get(`http://localhost:8080/getProgressNumber`).then(res => {
       const progressNumber = res.data;
-      this.setState({ progressNumber });
+      //this.setState({ progressNumber });
+      this.props.refNP(progressNumber);
+      console.log(this.props);
     });
   }
 
@@ -133,8 +135,8 @@ class Main extends React.Component {
   }
 
   checkRow(){
-    const {rows,selectValue,articolo,lotto,quantita} = this.state;
-
+    const {selectValue} = this.props;
+    const {articolo,lotto,quantita} = this.state;
     if(articolo!= '' && lotto!= '' && quantita!= ''){
       var row ={idArticolo:articolo , idLotto:lotto , quantita:quantita};
       var json=JSON.stringify(row);
@@ -145,8 +147,7 @@ class Main extends React.Component {
           const message = response.data;
 
           if(message == "ok"){
-            rows.push({idArticolo:articolo , idLotto:lotto , quantita:quantita});
-            this.setState({rows});
+            this.props.addRow(articolo , lotto , quantita);
             this.resetValueRow();
           }else{
             alert(message);
@@ -155,11 +156,15 @@ class Main extends React.Component {
           console.log(response);
         });
     }else{alert("Valori Mancanti")}
+
+    console.log(this.props);
   }
   
   handleChange(event) {
-    this.state.rows = [];
-    this.setState({ selectValue: event.target.value });
+    //this.state.rows = [];
+    //this.setState({ selectValue: event.target.value });
+    this.props.clearRows();
+    this.props.docType(event.target.value);
   }
 
   dataChange(event){
@@ -187,10 +192,12 @@ class Main extends React.Component {
   }
 
   deleteRow(index){
-    this.setState({
+    this.props.delRow(index);
+
+    /*this.setState({
       rows: this.state.rows.filter((_, i) => i !== index)
       //rows: rows.slice(0, index).concat(rows.slice(index + 1, rows.length))
-    });
+    });*/
   }
 
   showHideCalendar(){
@@ -204,10 +211,8 @@ class Main extends React.Component {
 
 
   render() {
-    const { head } = this.props;
-    const { selectValue, progressNumber,rows,articolo,lotto,quantita,value, suggestions,cssCalendar,data} = this.state;
-    //const {rows} = this.props;
-    console.log(this.props);
+    const { head,rows,progressNumber } = this.props;
+    const { selectValue, /*progressNumber,rows,*/articolo,lotto,quantita,value, suggestions,cssCalendar,data} = this.state;
 
     // Autosuggest will pass through all these props to the input.
     const inputProps = {
@@ -268,7 +273,7 @@ class Main extends React.Component {
             </tr>
             {rows.map((row, index) => (
             <tr className="rows">
-               <Row index={index} articolo={articolo} lotto={lotto} quantita={quantita} />
+               <Row index={index} articolo={row.idArticolo} lotto={row.idLotto} quantita={row.quantita} />
                <td><button className="Button" onClick={() =>this.deleteRow(index)}>Elimina Riga</button></td>
             </tr>
             ))}
@@ -285,8 +290,20 @@ class Main extends React.Component {
 
 const mapStateToProps = (state) => {
   return {
-    rows: state.rows
+    rows: state.rows,
+    progressNumber: state.progressNumber,
+    selectValue: state.selectValue,
   }
 }
 
-export default connect (mapStateToProps)(Main);
+const mapDispatchToProps = (dispatch) => {
+  return{
+    addRow: (articolo,lotto,quantita) => {dispatch({type: 'ADD_ROW', articolo:articolo , lotto:lotto , quantita:quantita })},
+    refNP: (progressNumber) => {dispatch({type: 'UPDATE_NP', numProg: progressNumber})},
+    docType: (DocType) => {dispatch({type: 'UPDATE_DT',DocType:DocType})},
+    clearRows: () =>{dispatch({type: 'CLEAR_ROWS'})},
+    delRow: (idRow) => {dispatch({type: 'DELETE_ROW',idRow:idRow})}
+  }
+}
+
+export default connect (mapStateToProps,mapDispatchToProps)(Main);
