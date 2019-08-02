@@ -1,7 +1,11 @@
+//const DATE_OPTIONS = {day: 'numeric', month: 'numeric', year: 'numeric'};
+
 const initialState = {
   rows:[],
   progressNumber: 0,
-  selectValue: 'fattura'
+  selectValue: 'fattura',
+  date: (new Date()).toLocaleDateString( window.userLang , {day: 'numeric', month: 'numeric', year: 'numeric'}),
+  cssCalendar:'hideCalendar',
 };
 
 function rootReducer(state = initialState, action) {
@@ -23,7 +27,7 @@ function rootReducer(state = initialState, action) {
   }
 
   if(action.type === 'UPDATE_DT'){
-    let selVal = action.DocType 
+    let selVal = action.docType 
    return {
      ...state,
      selectValue:selVal
@@ -31,17 +35,34 @@ function rootReducer(state = initialState, action) {
   }
 
   if(action.type === 'CLEAR_ROWS'){
-   return{
-     ...state,
-     rows: []
-   }
+    let newRows= [];
+    return{
+      ...state,
+      rows: newRows
+    }
   }
 
    if(action.type === 'DELETE_ROW'){
-    let newRows = state.rows.filter((_, i) => i !== action.idRows);;
+    let newRows = state.rows.filter((_, i) => i !== action.idRow);
     return{
       ...state,
       rows:newRows
+    }
+  }
+
+  if(action.type === 'UPDATE_DATE'){
+    let newDate = action.date; 
+    return{
+      ...state,
+      date:newDate
+    }
+  }
+
+  if(action.type === 'UPDATE_CSS_CAL'){
+    let newCssCalendar = action.cssCalendar; 
+    return{
+      ...state,
+      cssCalendar:newCssCalendar
     }
   }
 

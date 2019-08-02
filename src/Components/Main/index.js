@@ -4,7 +4,15 @@ import Row from '../Row/index.js';
 import axios from 'axios';
 import Autosuggest from 'react-autosuggest';
 import Calendar from 'react-calendar';
-import { connect } from "react-redux";
+import { connect } from 'react-redux';
+
+import {addRow} from '../../js/action/action.js';
+import {refNP} from '../../js/action/action.js';
+import {upDocType} from '../../js/action/action.js';
+import {clearRows} from '../../js/action/action.js';
+import {delRow} from '../../js/action/action.js';
+import {changeDate} from '../../js/action/action.js';
+import {changeCssCal} from '../../js/action/action.js';
 
 //======================================================
   var articles = null;
@@ -41,29 +49,19 @@ class Main extends React.Component {
 
     this.checkRow = this.checkRow.bind(this);
     this.dataChange = this.dataChange.bind(this);
-    this.resechLottoCode = this.resechLottoCode.bind(this);
+    //this.resechLottoCode = this.resechLottoCode.bind(this);
     this.showHideCalendar = this.showHideCalendar.bind(this);
     this.resetValueRow = this.resetValueRow.bind(this);
     this.valueChange = this.valueChange.bind(this);
     this.handleChange = this.handleChange.bind(this);
-    this.submit = this.submit.bind(this);
 
-    /*const DATE_OPTIONS = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' };
-    (new Date()).toLocaleDateString( window.userLang , DATE_OPTIONS )*/
-    const DATE_OPTIONS = {day: 'numeric', month: 'numeric', year: 'numeric'};
     this.state = {
-      //rows: [],
-      //progressNumber: null,
-      //selectValue: 'fattura',
-      data: (new Date()).toLocaleDateString( window.userLang , DATE_OPTIONS ),
-
       articolo:'',
       lotto:'',
       quantita:'',
 
       value: '',
       suggestions: [],
-      cssCalendar: 'hideCalendar'
 
     };
   }
@@ -71,7 +69,6 @@ class Main extends React.Component {
   componentDidMount() {
     axios.get(`http://localhost:8080/getProgressNumber`).then(res => {
       const progressNumber = res.data;
-      //this.setState({ progressNumber });
       this.props.refNP(progressNumber);
       console.log(this.props);
     });
@@ -79,7 +76,7 @@ class Main extends React.Component {
 
 //========================================
 
-  resechLottoCode(articoloCode){
+  /*resechLottoCode(articoloCode){
     var lottoCode=null;
     var idArticolo=null;
 
@@ -91,11 +88,14 @@ class Main extends React.Component {
 
     alert("lotto code->"+lottoCode);
     return lottoCode;
-  }
+  }*/
 
   onChange2 = date => {
     const DATE_OPTIONS = {day: 'numeric', month: 'numeric', year: 'numeric'};
-    this.setState({ data:date.toLocaleDateString( window.userLang , DATE_OPTIONS ) })
+    let dateImp = date.toLocaleDateString( window.userLang , DATE_OPTIONS )
+    this.props.changeDate(dateImp);
+
+    //this.setState({ data:date.toLocaleDateString( window.userLang , DATE_OPTIONS ) })
   } 
 
   onChange = (event, { newValue }) => {
@@ -122,10 +122,11 @@ class Main extends React.Component {
   };
   //========================================
   sentToDB() {
-    const { rows, selectValue,data } = this.state;
+    const  {date,rows,selectValue} = this.props;
     var json=JSON.stringify(rows);
+
     if(rows.length > 0){
-      axios.post('http://localhost:8080/insertDocument?codice='+selectValue+'&data='+data,json,{headers: {'Content-Type': 'application/json',}})
+      axios.post('http://localhost:8080/insertDocument?codice='+selectValue+'&data='+date,json,{headers: {'Content-Type': 'application/json',}})
         .then(response => {
           console.log(response);
         });
@@ -137,6 +138,7 @@ class Main extends React.Component {
   checkRow(){
     const {selectValue} = this.props;
     const {articolo,lotto,quantita} = this.state;
+    
     if(articolo!= '' && lotto!= '' && quantita!= ''){
       var row ={idArticolo:articolo , idLotto:lotto , quantita:quantita};
       var json=JSON.stringify(row);
@@ -152,28 +154,22 @@ class Main extends React.Component {
           }else{
             alert(message);
           }
-
-          console.log(response);
+          //console.log(response);
         });
-    }else{alert("Valori Mancanti")}
+    }else{
+      alert("Valori Mancanti")
+    }
 
     console.log(this.props);
   }
   
   handleChange(event) {
-    //this.state.rows = [];
-    //this.setState({ selectValue: event.target.value });
     this.props.clearRows();
-    this.props.docType(event.target.value);
+    this.props.upDocType(event.target.value);
   }
 
   dataChange(event){
-    this.setState({data: event.target.value});
-  }
-
-  submit() {
-    this.sentToDB();
-    // event.preventDefault();
+    this.props.dataChange(event.target.value);
   }
 
   valueChange(event,nameVariable){
@@ -193,26 +189,24 @@ class Main extends React.Component {
 
   deleteRow(index){
     this.props.delRow(index);
-
-    /*this.setState({
-      rows: this.state.rows.filter((_, i) => i !== index)
-      //rows: rows.slice(0, index).concat(rows.slice(index + 1, rows.length))
-    });*/
+    console.log(this.props);
   }
 
   showHideCalendar(){
-    const {cssCalendar} = this.state
+    const {cssCalendar} = this.props;
+
     if(cssCalendar == 'hideCalendar'){
-      this.setState({cssCalendar:'showCalendar'});
+      this.props.changeCssCal('showCalendar');
     }else if(cssCalendar == 'showCalendar'){
-      this.setState({cssCalendar:'hideCalendar'});
+      this.props.changeCssCal('hideCalendar');
     }
+
   }
 
 
   render() {
-    const { head,rows,progressNumber } = this.props;
-    const { selectValue, /*progressNumber,rows,*/articolo,lotto,quantita,value, suggestions,cssCalendar,data} = this.state;
+    const { head,rows,progressNumber,date,selectValue,cssCalendar } = this.props;
+    const {articolo,lotto,quantita,value, suggestions} = this.state;
 
     // Autosuggest will pass through all these props to the input.
     const inputProps = {
@@ -248,8 +242,8 @@ class Main extends React.Component {
               </td>
               <td>
                 <div className="calendar">
-                  <p className={cssCalendar}><Calendar onChange={this.onChange2} value={this.state.date}/></p>
-                  <input type="text" className="input" placeholder="Data yyyy/mm/gg" value={data} onChange={this.dataChange}/>
+                  <p className={cssCalendar}><Calendar onChange={this.onChange2}/></p>
+                  <input type="text" className="input" placeholder="Data yyyy/mm/gg" value={date} onChange={this.dataChange}/>
                   <img src={require('./calendar.png')} onClick={this.showHideCalendar}/>
                 </div>
               </td>
@@ -281,7 +275,7 @@ class Main extends React.Component {
           <br />
         </div>
         <div className="footer">
-          <input type="submit" value="INVIA" className="Button" onClick={this.submit} />
+          <input type="submit" value="INVIA" className="Button" onClick={this.sentToDB} />
         </div>
       </div>
     );
@@ -293,16 +287,30 @@ const mapStateToProps = (state) => {
     rows: state.rows,
     progressNumber: state.progressNumber,
     selectValue: state.selectValue,
+    date: state.date,
+    cssCalendar: state.cssCalendar,
+
   }
 }
 
 const mapDispatchToProps = (dispatch) => {
   return{
+    /*
     addRow: (articolo,lotto,quantita) => {dispatch({type: 'ADD_ROW', articolo:articolo , lotto:lotto , quantita:quantita })},
     refNP: (progressNumber) => {dispatch({type: 'UPDATE_NP', numProg: progressNumber})},
-    docType: (DocType) => {dispatch({type: 'UPDATE_DT',DocType:DocType})},
+    docType: (docType) => {dispatch({type: 'UPDATE_DT',docType:docType})},
     clearRows: () =>{dispatch({type: 'CLEAR_ROWS'})},
-    delRow: (idRow) => {dispatch({type: 'DELETE_ROW',idRow:idRow})}
+    delRow: (idRow) => {dispatch({type: 'DELETE_ROW',idRow:idRow})},
+    changeDate: (date) => dispatch({type: 'UPDATE_DATE',date:date}),
+    changeCssCal : (cssCalendar) => dispatch({type: 'UPDATE_CSS_CAL',cssCalendar:cssCalendar})
+    */
+    addRow: (articolo,lotto,quantita) =>{dispatch(addRow(articolo,lotto,quantita))},
+    refNP: (progressNumber) => {dispatch(refNP(progressNumber))},
+    upDocType: (docType) => {dispatch(upDocType(docType))},
+    clearRows: () =>{dispatch(clearRows())},
+    delRow: (idRow) => {dispatch(delRow(idRow))},
+    changeDate: (date) => dispatch(changeDate(date)),
+    changeCssCal : (cssCalendar) => dispatch(changeCssCal(cssCalendar))  
   }
 }
 
