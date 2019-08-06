@@ -13,35 +13,12 @@ import {clearRows} from '../../js/action/action.js';
 import {delRow} from '../../js/action/action.js';
 import {changeDate} from '../../js/action/action.js';
 import {changeCssCal} from '../../js/action/action.js';
+import {setSuggArticles} from '../../js/action/action.js';
 
-//======================================================
-  var articles = null;
+import {getSuggestions} from '../../js/constant/index.js';
+import {getSuggestionValue} from '../../js/constant/index.js';
+import {renderSuggestion} from '../../js/constant/index.js';
 
-  axios.get(`http://localhost:8080/getAllArticles`).then(res => {
-    articles =  res.data;
-  });
-
-// Teach Autosuggest how to calculate suggestions for any given input value.
-const getSuggestions = value => {
-  const inputValue = value.trim().toLowerCase();
-  const inputLength = inputValue.length;
-
-  return inputLength === 0 ? [] : articles.filter(lang =>
-    lang.codice.toLowerCase().slice(0, inputLength) === inputValue
-  );
-};
-
-// When suggestion is clicked, Autosuggest needs to populate the input
-// based on the clicked suggestion. Teach Autosuggest how to calculate the
-// input value for every given suggestion.
-const getSuggestionValue = suggestion => suggestion.codice;
-
-// Use your imagination to render suggestions.
-const renderSuggestion = suggestion => (
-  <div>
-    {suggestion.codice}
-  </div>
-);
 //======================================================
 class Main extends React.Component {
   constructor(props) {
@@ -73,9 +50,7 @@ class Main extends React.Component {
       console.log(this.props);
     });
   }
-
-//========================================
-
+//========================================  
   /*resechLottoCode(articoloCode){
     var lottoCode=null;
     var idArticolo=null;
@@ -99,6 +74,12 @@ class Main extends React.Component {
   } 
 
   onChange = (event, { newValue }) => {
+
+    axios.get(`http://localhost:8080/getTenArticlesForCode?codice=`+newValue).then(res => {
+      const articles =  res.data;
+      this.props.setSuggArticles(articles);
+    });
+
     this.setState({
       value: newValue,
       articolo: newValue,
@@ -109,9 +90,13 @@ class Main extends React.Component {
   // Autosuggest will call this function every time you need to update suggestions.
   // You already implemented this logic above, so just use it.
   onSuggestionsFetchRequested = ({ value }) => {
-    this.setState({
-      suggestions: getSuggestions(value)
-    });
+
+    setTimeout(() => {
+      this.setState({
+        suggestions: getSuggestions(value,this.props.suggArticles)
+      });
+    }, 100);
+
   };
 
   // Autosuggest will call this function every time you need to clear suggestions.
@@ -289,28 +274,21 @@ const mapStateToProps = (state) => {
     selectValue: state.selectValue,
     date: state.date,
     cssCalendar: state.cssCalendar,
+    suggArticles:state.suggArticles,
 
   }
 }
 
 const mapDispatchToProps = (dispatch) => {
   return{
-    /*
-    addRow: (articolo,lotto,quantita) => {dispatch({type: 'ADD_ROW', articolo:articolo , lotto:lotto , quantita:quantita })},
-    refNP: (progressNumber) => {dispatch({type: 'UPDATE_NP', numProg: progressNumber})},
-    docType: (docType) => {dispatch({type: 'UPDATE_DT',docType:docType})},
-    clearRows: () =>{dispatch({type: 'CLEAR_ROWS'})},
-    delRow: (idRow) => {dispatch({type: 'DELETE_ROW',idRow:idRow})},
-    changeDate: (date) => dispatch({type: 'UPDATE_DATE',date:date}),
-    changeCssCal : (cssCalendar) => dispatch({type: 'UPDATE_CSS_CAL',cssCalendar:cssCalendar})
-    */
     addRow: (articolo,lotto,quantita) =>{dispatch(addRow(articolo,lotto,quantita))},
     refNP: (progressNumber) => {dispatch(refNP(progressNumber))},
     upDocType: (docType) => {dispatch(upDocType(docType))},
     clearRows: () =>{dispatch(clearRows())},
     delRow: (idRow) => {dispatch(delRow(idRow))},
     changeDate: (date) => dispatch(changeDate(date)),
-    changeCssCal : (cssCalendar) => dispatch(changeCssCal(cssCalendar))  
+    changeCssCal : (cssCalendar) => dispatch(changeCssCal(cssCalendar)),
+    setSuggArticles : (articles) => dispatch(setSuggArticles(articles)),
   }
 }
 

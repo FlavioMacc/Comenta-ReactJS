@@ -6,6 +6,8 @@ const initialState = {
   selectValue: 'fattura',
   date: (new Date()).toLocaleDateString( window.userLang , {day: 'numeric', month: 'numeric', year: 'numeric'}),
   cssCalendar:'hideCalendar',
+
+  suggArticles:[{id: 0, codice: "loading", descrizione: "0"}],
 };
 
 function rootReducer(state = initialState, action) {
@@ -19,7 +21,7 @@ function rootReducer(state = initialState, action) {
   }
 
   if(action.type === 'UPDATE_NP'){
-    let numProg = action.numProg;
+    let numProg = action.progressNumber;
     return{
       ...state,
       progressNumber: numProg
@@ -63,6 +65,14 @@ function rootReducer(state = initialState, action) {
     return{
       ...state,
       cssCalendar:newCssCalendar
+    }
+  }
+
+  if(action.type === 'SET_SUGG_ART'){
+    let newSuggArticles = action.articles; 
+    return{
+      ...state,
+      suggArticles:newSuggArticles
     }
   }
 

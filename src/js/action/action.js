@@ -47,3 +47,10 @@ export const changeCssCal = (cssCalendar) => {
         cssCalendar
     }
 }
+
+export const setSuggArticles = (articles) => {
+    return {
+        type:'SET_SUGG_ART',
+        articles
+    }
+}
