@@ -76,6 +76,14 @@ function rootReducer(state = initialState, action) {
     }
   }
 
+  if(action.type === 'SET_ROWS'){
+    let newRows = action.newRows; 
+    return{
+      ...state,
+      rows:newRows
+    }
+  }
+
   return state;
 }
 

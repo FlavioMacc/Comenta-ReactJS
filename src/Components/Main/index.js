@@ -14,6 +14,7 @@ import {delRow} from '../../js/action/action.js';
 import {changeDate} from '../../js/action/action.js';
 import {changeCssCal} from '../../js/action/action.js';
 import {setSuggArticles} from '../../js/action/action.js';
+import {setRows} from '../../js/action/action.js';
 
 import {getSuggestions} from '../../js/constant/index.js';
 import {getSuggestionValue} from '../../js/constant/index.js';
@@ -26,7 +27,7 @@ class Main extends React.Component {
 
     this.checkRow = this.checkRow.bind(this);
     this.dataChange = this.dataChange.bind(this);
-    //this.resechLottoCode = this.resechLottoCode.bind(this);
+    this.updateRow = this.updateRow.bind(this);
     this.showHideCalendar = this.showHideCalendar.bind(this);
     this.resetValueRow = this.resetValueRow.bind(this);
     this.valueChange = this.valueChange.bind(this);
@@ -38,8 +39,6 @@ class Main extends React.Component {
       quantita:'',
 
       value: '',
-      suggestions: [],
-
     };
   }
 
@@ -51,14 +50,14 @@ class Main extends React.Component {
     });
   }
 //========================================  
-  /*resechLottoCode(articoloCode){
+  /*async resechLottoCode(articoloCode){
     var lottoCode=null;
     var idArticolo=null;
 
-    axios.get(`http://localhost:8080/getIdArticleForCode`,{ params: { codice: articoloCode } })
+    await axios.get(`http://localhost:8080/getIdArticleForCode`,{ params: { codice: articoloCode } })
     .then(res => { idArticolo = res.data });
 
-    axios.get(`http://localhost:8080/getCodeLottoForIdArticle?idArticle=`+idArticolo)
+    await axios.get(`http://localhost:8080/getCodeLottoForIdArticle?idArticle=`+idArticolo)
     .then(res => { lottoCode = res.data });
 
     alert("lotto code->"+lottoCode);
@@ -90,13 +89,7 @@ class Main extends React.Component {
   // Autosuggest will call this function every time you need to update suggestions.
   // You already implemented this logic above, so just use it.
   onSuggestionsFetchRequested = ({ value }) => {
-
-    setTimeout(() => {
-      this.setState({
-        suggestions: getSuggestions(value,this.props.suggArticles)
-      });
-    }, 100);
-
+    this.setState({ suggestions : getSuggestions(value,this.props.suggArticles)});
   };
 
   // Autosuggest will call this function every time you need to clear suggestions.
@@ -172,9 +165,18 @@ class Main extends React.Component {
     this.setState({articolo:'' , lotto:'' , quantita:'',value:''});
   }
 
-  deleteRow(index){
-    this.props.delRow(index);
-    console.log(this.props);
+  async deleteRow(index){
+    let newRows;
+    await this.props.delRow(index);
+
+    newRows=this.props.rows;
+
+    await this.props.clearRows();
+    await this.props.setRows(newRows);
+  }
+
+  updateRow(index){
+
   }
 
   showHideCalendar(){
@@ -191,7 +193,7 @@ class Main extends React.Component {
 
   render() {
     const { head,rows,progressNumber,date,selectValue,cssCalendar } = this.props;
-    const {articolo,lotto,quantita,value, suggestions} = this.state;
+    const {articolo,lotto,quantita,value} = this.state;
 
     // Autosuggest will pass through all these props to the input.
     const inputProps = {
@@ -238,8 +240,9 @@ class Main extends React.Component {
             </tr>
             <tr className="exampleRow">
               <td><Autosuggest
-                    suggestions={suggestions}
-                    onSuggestionsFetchRequested={this.onSuggestionsFetchRequested}
+                    suggestions={this.props.suggArticles}
+                    //suggestions={suggestions}
+                    //onSuggestionsFetchRequested={this.onSuggestionsFetchRequested}
                     onSuggestionsClearRequested={this.onSuggestionsClearRequested}
                     getSuggestionValue={getSuggestionValue}
                     renderSuggestion={renderSuggestion}
@@ -253,7 +256,10 @@ class Main extends React.Component {
             {rows.map((row, index) => (
             <tr className="rows">
                <Row index={index} articolo={row.idArticolo} lotto={row.idLotto} quantita={row.quantita} />
-               <td><button className="Button" onClick={() =>this.deleteRow(index)}>Elimina Riga</button></td>
+               <td>
+                  <button className="Button" onClick={() =>this.deleteRow(index)}>Elimina Riga</button>
+                  <button className="Button" onClick={() =>this.updateRow(index)}>Modifica Riga</button>
+               </td>
             </tr>
             ))}
           </table>
@@ -275,7 +281,6 @@ const mapStateToProps = (state) => {
     date: state.date,
     cssCalendar: state.cssCalendar,
     suggArticles:state.suggArticles,
-
   }
 }
 
@@ -289,6 +294,7 @@ const mapDispatchToProps = (dispatch) => {
     changeDate: (date) => dispatch(changeDate(date)),
     changeCssCal : (cssCalendar) => dispatch(changeCssCal(cssCalendar)),
     setSuggArticles : (articles) => dispatch(setSuggArticles(articles)),
+    setRows : (newRows) => dispatch(setRows(newRows)),
   }
 }
 

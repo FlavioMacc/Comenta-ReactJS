@@ -102,6 +102,13 @@ tr.exampleRow input{
   border-radius: 4px;
 }
 
+tr.rows .Button{
+  width: 120px;
+  height: 30px;
+  background: #fff;
+  border-radius: 4px;
+}
+
 .react-autosuggest__container {
     
     position: relative;

@@ -54,3 +54,10 @@ export const setSuggArticles = (articles) => {
         articles
     }
 }
+
+export const setRows = (newRows) => {
+    return {
+        type:'SET_ROWS',
+        newRows
+    }
+}
