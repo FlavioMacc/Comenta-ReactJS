@@ -15,6 +15,7 @@ import {changeDate} from '../../js/action/action.js';
 import {changeCssCal} from '../../js/action/action.js';
 import {setSuggArticles} from '../../js/action/action.js';
 import {setRows} from '../../js/action/action.js';
+import {updateRow} from '../../js/action/action.js';
 
 import {getSuggestions} from '../../js/constant/index.js';
 import {getSuggestionValue} from '../../js/constant/index.js';
@@ -26,6 +27,7 @@ class Main extends React.Component {
     super(props);
 
     this.checkRow = this.checkRow.bind(this);
+    this.addCheckRow = this.addCheckRow.bind(this);
     this.dataChange = this.dataChange.bind(this);
     this.updateRow = this.updateRow.bind(this);
     this.showHideCalendar = this.showHideCalendar.bind(this);
@@ -113,13 +115,11 @@ class Main extends React.Component {
     }
   }
 
-  checkRow(){
+  checkRow(row,type){
     const {selectValue} = this.props;
-    const {articolo,lotto,quantita} = this.state;
-    
-    if(articolo!= '' && lotto!= '' && quantita!= ''){
-      var row ={idArticolo:articolo , idLotto:lotto , quantita:quantita};
-      var json=JSON.stringify(row);
+    if(row[0]!= '' && row[1]!= '' && row[2]!= ''){
+      var rowI ={idArticolo:row[0] , idLotto:row[1] , quantita:row[2]};
+      var json=JSON.stringify(rowI);
 
       axios.post('http://localhost:8080/checkRow?codice='+selectValue,json,{headers: {'Content-Type': 'application/json'}})
         .then(response => { 
@@ -127,8 +127,12 @@ class Main extends React.Component {
           const message = response.data;
 
           if(message == "ok"){
-            this.props.addRow(articolo , lotto , quantita);
-            this.resetValueRow();
+            if(type === "insert"){
+              this.props.addRow(row[0] , row[1] , row[2]);
+              this.resetValueRow();
+            }else if(type === "update"){
+              this.props.updateRow(row[0] , row[1] , row[2],row[3]);
+            }
           }else{
             alert(message);
           }
@@ -139,6 +143,12 @@ class Main extends React.Component {
     }
 
     console.log(this.props);
+  }
+
+  addCheckRow(){
+    const {articolo,lotto,quantita} = this.state;
+    let row=[articolo,lotto,quantita];
+    this.checkRow(row,"insert");
   }
   
   handleChange(event) {
@@ -175,8 +185,10 @@ class Main extends React.Component {
     await this.props.setRows(newRows);
   }
 
-  updateRow(index){
+  updateRow(row){
+    this.checkRow(row,"update");
 
+    
   }
 
   showHideCalendar(){
@@ -251,11 +263,11 @@ class Main extends React.Component {
               </td>
               <td><input type="text" placeholder="codice Lotto" className="input" value={lotto} onChange={(e)=>this.valueChange(e,"lotto")}/></td>
               <td><input type="number" placeholder="quantita" className="input" value={quantita} onChange={(e)=>this.valueChange(e,"quantita")}/></td>
-              <td><button type="button" className="Button" onClick={this.checkRow}>Aggiungi Riga</button></td>
+              <td><button type="button" className="Button" onClick={this.addCheckRow}>Aggiungi Riga</button></td>
             </tr>
             {rows.map((row, index) => (
             <tr className="rows">
-               <Row index={index} articolo={row.idArticolo} lotto={row.idLotto} quantita={row.quantita} />
+               <Row index={index} articolo={row.idArticolo} lotto={row.idLotto} quantita={row.quantita} upRow={this.updateRow}/>
                <td>
                   <button className="Button" onClick={() =>this.deleteRow(index)}>Elimina Riga</button>
                   <button className="Button" onClick={() =>this.updateRow(index)}>Modifica Riga</button>
@@ -295,6 +307,7 @@ const mapDispatchToProps = (dispatch) => {
     changeCssCal : (cssCalendar) => dispatch(changeCssCal(cssCalendar)),
     setSuggArticles : (articles) => dispatch(setSuggArticles(articles)),
     setRows : (newRows) => dispatch(setRows(newRows)),
+    updateRow :(articolo,lotto,quantita,index) => dispatch(updateRow(articolo,lotto,quantita,index)),
   }
 }
 

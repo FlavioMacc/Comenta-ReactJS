@@ -7,6 +7,16 @@ export const addRow = (articolo,lotto,quantita) =>{
     }
 }
 
+export const updateRow = (articolo,lotto,quantita,index) =>{
+    return {
+        type:'UPDATE_ROW', 
+        articolo,
+        lotto,
+        quantita,
+        index
+    }
+}
+
 export const refNP = (progressNumber) => {
     return {
         type:'UPDATE_NP',

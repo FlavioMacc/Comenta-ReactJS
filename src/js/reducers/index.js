@@ -11,9 +11,19 @@ const initialState = {
 };
 
 function rootReducer(state = initialState, action) {
+
   if(action.type === 'ADD_ROW'){
     let newRows = state.rows;
     newRows.push({idArticolo: action.articolo,idLotto:action.lotto,quantita:action.quantita});
+    return {
+      ...state,
+      rows: newRows
+    }
+  }
+
+  if(action.type === 'UPDATE_ROW'){ 
+    let newRows = state.rows;
+    newRows[action.index]={idArticolo: action.articolo,idLotto:action.lotto,quantita:action.quantita};
     return {
       ...state,
       rows: newRows

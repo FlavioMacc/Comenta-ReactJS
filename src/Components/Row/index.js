@@ -14,17 +14,24 @@ class Row extends React.Component {
   }
 
   onChange(event,nameVariable){
+    const {index,articolo,lotto,quantita} = this.state;
+    let row;
     if(nameVariable == 'articolo'){
       this.setState({ articolo: event.target.value });
+      row=[event.target.value,lotto,quantita,index];
     }else if(nameVariable == 'lotto'){
       this.setState({ lotto: event.target.value });
+      row=[articolo,event.target.value,quantita,index];
     }else if(nameVariable == 'quantita'){
       this.setState({ quantita: event.target.value });
+      row=[articolo,lotto,event.target.value,index];
     }
+    
+    this.props.upRow(row);
   }
 
   render() {
-    const {articolo,lotto,quantita} = this.state;
+    const {articolo,lotto,quantita} = this.state; 
     return (
       <>
         <td>
