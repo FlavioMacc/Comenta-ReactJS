@@ -1,9 +1,3 @@
-html, body {
-    height: 100%;
-    width: 100%;
-    background: #819ca9;
-  }
-
 span{
     display: inline-block;
     vertical-align: middle;
@@ -35,6 +29,8 @@ span{
   height: 20px;
 }
 
+
+
 .headButton{
   background-color: unset;
   border: none;
@@ -52,7 +48,7 @@ span{
     position: relative;
   }
   
-  .react-autosuggest__input {
+  /*.react-autosuggest__input {
     width: 240px;
     height: 30px;
     padding: 10px 20px;
@@ -62,7 +58,7 @@ span{
     border: 1px solid #aaa;
     border-radius: 4px;
     
-  }
+  }*/
   
   .react-autosuggest__input--focused {
     outline: none;

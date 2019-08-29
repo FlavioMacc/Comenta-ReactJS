@@ -2,7 +2,7 @@ import React from 'react';
 import './view.css';
 import Line from '../Row/index.js';
 import axios from 'axios';
-import { connect } from 'react-redux';
+import '../../customs.scss';
 
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
@@ -12,26 +12,16 @@ import ButtonGroup from 'react-bootstrap/ButtonGroup'
 import InputGroup from 'react-bootstrap/InputGroup';
 import FormControl from 'react-bootstrap/FormControl';
 import Form from 'react-bootstrap/Form'
-import Image from 'react-bootstrap/Image'
 import OverlayTrigger from 'react-bootstrap/OverlayTrigger'
 import Tooltip from 'react-bootstrap/Tooltip'
+
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faCalendar } from '@fortawesome/free-solid-svg-icons'
 
 import Calendar from 'react-calendar';
 import Autosuggest from 'react-autosuggest';
 
-import {addRow} from '../../js/action/action.js';
-import {refNP} from '../../js/action/action.js';
-import {upDocType} from '../../js/action/action.js';
-import {clearRows} from '../../js/action/action.js';
-import {delRow} from '../../js/action/action.js';
-import {changeDate} from '../../js/action/action.js';
-import {setSuggArticles} from '../../js/action/action.js';
-import {setRows} from '../../js/action/action.js';
-import {updateRow} from '../../js/action/action.js';
-
-import {getSuggestions} from '../../js/constant/index.js';
-import {getSuggestionValue} from '../../js/constant/index.js';
-import {renderSuggestion} from '../../js/constant/index.js';
+import {getSuggestions,getSuggestionValue,renderSuggestion} from '../../js/constant/index.js';
 
 //======================================================
 class Main extends React.Component {
@@ -40,11 +30,11 @@ class Main extends React.Component {
 
     this.checkRow = this.checkRow.bind(this);
     this.addCheckRow = this.addCheckRow.bind(this);
-    this.dataChange = this.dataChange.bind(this);
     this.updateRow = this.updateRow.bind(this);
     this.resetValueRow = this.resetValueRow.bind(this);
     this.valueChange = this.valueChange.bind(this);
     this.handleChange = this.handleChange.bind(this);
+    this.sentToDB = this.sentToDB.bind(this);
 
     this.state = {
       articolo:'',
@@ -164,10 +154,6 @@ class Main extends React.Component {
     this.props.upDocType(event.target.value);
   }
 
-  dataChange(event){
-    this.props.dataChange(event.target.value);
-  }
-
   valueChange(event,nameVariable){
 
     if(nameVariable === 'articolo'){
@@ -249,17 +235,16 @@ class Main extends React.Component {
               </Col>
               <Col lg>
                 <InputGroup>
-                  <InputGroup.Prepend /*ref={this.setWrapperRef}*/>
-                    <InputGroup.Text id="image">
+                  <InputGroup.Prepend>
+                    <InputGroup.Text>
                       <OverlayTrigger rootClose={true} trigger="click" placement="bottom" overlay={<Tooltip id="calendar" bsPrefix="calendarSize"><Calendar onChange={this.onChange2}/></Tooltip>}>
-                        <Image className="image" src={require('./calendar.png')} onClick={this.showCalendar}/>
+                        <FontAwesomeIcon icon={faCalendar} />
                       </OverlayTrigger>
                     </InputGroup.Text>
                   </InputGroup.Prepend>
                   <FormControl
                     readOnly
                     value={date}
-                    onChange={this.dataChange}
                     aria-label="progressNumber"
                     aria-describedby="progNumber"
                   />
@@ -274,14 +259,20 @@ class Main extends React.Component {
             </Row>
             <Row>
               <Col lg>
-                <Autosuggest
+
+              <InputGroup>
+                  <InputGroup.Prepend>
+                    <InputGroup.Text id="article">Articolo:</InputGroup.Text>
+                  </InputGroup.Prepend>
+                  <Autosuggest
                     suggestions={this.props.suggArticles}
                     //onSuggestionsFetchRequested={this.onSuggestionsFetchRequested}
                     onSuggestionsClearRequested={this.onSuggestionsClearRequested}
                     getSuggestionValue={getSuggestionValue}
                     renderSuggestion={renderSuggestion}
                     inputProps={inputProps}
-                />
+                  />
+                </InputGroup>
               </Col>
               <Col lg>
                 <InputGroup>
@@ -345,28 +336,4 @@ class Main extends React.Component {
   }
 }
 
-const mapStateToProps = (state) => {
-  return {
-    rows: state.rows,
-    progressNumber: state.progressNumber,
-    selectValue: state.selectValue,
-    date: state.date,
-    suggArticles:state.suggArticles,
-  }
-}
-
-const mapDispatchToProps = (dispatch) => {
-  return{
-    addRow: (articolo,lotto,quantita) =>{dispatch(addRow(articolo,lotto,quantita))},
-    refNP: (progressNumber) => {dispatch(refNP(progressNumber))},
-    upDocType: (docType) => {dispatch(upDocType(docType))},
-    clearRows: () =>{dispatch(clearRows())},
-    delRow: (idRow) => {dispatch(delRow(idRow))},
-    changeDate: (date) => dispatch(changeDate(date)),
-    setSuggArticles : (articles) => dispatch(setSuggArticles(articles)),
-    setRows : (newRows) => dispatch(setRows(newRows)),
-    updateRow :(articolo,lotto,quantita,index) => dispatch(updateRow(articolo,lotto,quantita,index)),
-  }
-}
-
-export default connect (mapStateToProps,mapDispatchToProps)(Main);
+export default Main;

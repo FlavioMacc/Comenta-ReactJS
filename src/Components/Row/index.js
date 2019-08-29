@@ -35,50 +35,33 @@ class Line extends React.Component {
   }
 
   render() {
-    const {articolo,lotto,quantita} = this.state; 
+    const {articolo,lotto,quantita} = this.state;
+
+    const valCol=[articolo,lotto,quantita];
+    const col=["articolo","lotto","quantita"]
+    const items = []
+
+    for (let i=0; i < 3; i++) {
+      items.push(
+        <Col lg>
+          <InputGroup>
+            <InputGroup.Prepend>
+              <InputGroup.Text id="basic-addon1">{col[i]}:</InputGroup.Text>
+            </InputGroup.Prepend>
+            <FormControl
+              value={valCol[i]}
+              onChange={(e) =>this.onChange(e,col[i])}
+              aria-label={col[i]}
+              aria-describedby="basic-addon1"
+            />
+            </InputGroup>
+        </Col>
+      )
+    }
+
     return (
       <>
-        <Col lg>
-          <InputGroup>
-            <InputGroup.Prepend>
-              <InputGroup.Text id="basic-addon1">Articolo:</InputGroup.Text>
-            </InputGroup.Prepend>
-            <FormControl
-              value={articolo}
-              onChange={(e) =>this.onChange(e,"articolo")}
-              aria-label="articolo"
-              aria-describedby="basic-addon1"
-            />
-            </InputGroup>
-        </Col>
-
-        <Col lg>
-          <InputGroup>
-            <InputGroup.Prepend>
-              <InputGroup.Text id="basic-addon1">Lotto:</InputGroup.Text>
-            </InputGroup.Prepend>
-            <FormControl
-              value={lotto}
-              onChange={(e) =>this.onChange(e,"lotto")}
-              aria-label="articolo"
-              aria-describedby="basic-addon1"
-            />
-            </InputGroup>
-        </Col>
-
-        <Col lg>
-          <InputGroup>
-            <InputGroup.Prepend>
-              <InputGroup.Text id="basic-addon1">Quantita:</InputGroup.Text>
-            </InputGroup.Prepend>
-            <FormControl
-              value={quantita} 
-              onChange={(e) =>this.onChange(e,"quantita")}
-              aria-label="articolo"
-              aria-describedby="basic-addon1"
-            />
-            </InputGroup>
-        </Col>
+        {items}
       </>
     );
   }
