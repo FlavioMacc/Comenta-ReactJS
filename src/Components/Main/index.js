@@ -1,10 +1,23 @@
 import React from 'react';
 import './view.css';
-import Row from '../Row/index.js';
+import Line from '../Row/index.js';
 import axios from 'axios';
-import Autosuggest from 'react-autosuggest';
-import Calendar from 'react-calendar';
 import { connect } from 'react-redux';
+
+import Container from 'react-bootstrap/Container';
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
+import Button from 'react-bootstrap/Button'
+import ButtonGroup from 'react-bootstrap/ButtonGroup'
+import InputGroup from 'react-bootstrap/InputGroup';
+import FormControl from 'react-bootstrap/FormControl';
+import Form from 'react-bootstrap/Form'
+import Image from 'react-bootstrap/Image'
+import OverlayTrigger from 'react-bootstrap/OverlayTrigger'
+import Tooltip from 'react-bootstrap/Tooltip'
+
+import Calendar from 'react-calendar';
+import Autosuggest from 'react-autosuggest';
 
 import {addRow} from '../../js/action/action.js';
 import {refNP} from '../../js/action/action.js';
@@ -12,7 +25,6 @@ import {upDocType} from '../../js/action/action.js';
 import {clearRows} from '../../js/action/action.js';
 import {delRow} from '../../js/action/action.js';
 import {changeDate} from '../../js/action/action.js';
-import {changeCssCal} from '../../js/action/action.js';
 import {setSuggArticles} from '../../js/action/action.js';
 import {setRows} from '../../js/action/action.js';
 import {updateRow} from '../../js/action/action.js';
@@ -30,7 +42,6 @@ class Main extends React.Component {
     this.addCheckRow = this.addCheckRow.bind(this);
     this.dataChange = this.dataChange.bind(this);
     this.updateRow = this.updateRow.bind(this);
-    this.showHideCalendar = this.showHideCalendar.bind(this);
     this.resetValueRow = this.resetValueRow.bind(this);
     this.valueChange = this.valueChange.bind(this);
     this.handleChange = this.handleChange.bind(this);
@@ -70,8 +81,6 @@ class Main extends React.Component {
     const DATE_OPTIONS = {day: 'numeric', month: 'numeric', year: 'numeric'};
     let dateImp = date.toLocaleDateString( window.userLang , DATE_OPTIONS )
     this.props.changeDate(dateImp);
-
-    //this.setState({ data:date.toLocaleDateString( window.userLang , DATE_OPTIONS ) })
   } 
 
   onChange = (event, { newValue }) => {
@@ -117,7 +126,7 @@ class Main extends React.Component {
 
   checkRow(row,type){
     const {selectValue} = this.props;
-    if(row[0]!= '' && row[1]!= '' && row[2]!= ''){
+    if(row[0]!== '' && row[1]!== '' && row[2]!== ''){
       var rowI ={idArticolo:row[0] , idLotto:row[1] , quantita:row[2]};
       var json=JSON.stringify(rowI);
 
@@ -126,7 +135,7 @@ class Main extends React.Component {
 
           const message = response.data;
 
-          if(message == "ok"){
+          if(message === "ok"){
             if(type === "insert"){
               this.props.addRow(row[0] , row[1] , row[2]);
               this.resetValueRow();
@@ -136,7 +145,6 @@ class Main extends React.Component {
           }else{
             alert(message);
           }
-          //console.log(response);
         });
     }else{
       alert("Valori Mancanti")
@@ -162,11 +170,11 @@ class Main extends React.Component {
 
   valueChange(event,nameVariable){
 
-    if(nameVariable == 'articolo'){
+    if(nameVariable === 'articolo'){
       this.setState({ articolo: event.target.value });
-    }else if(nameVariable == 'lotto'){
+    }else if(nameVariable === 'lotto'){
       this.setState({ lotto: event.target.value });
-    }else if(nameVariable == 'quantita'){
+    }else if(nameVariable === 'quantita'){
       this.setState({ quantita: event.target.value });
     }
   }
@@ -187,25 +195,11 @@ class Main extends React.Component {
 
   updateRow(row){
     this.checkRow(row,"update");
-
-    
   }
-
-  showHideCalendar(){
-    const {cssCalendar} = this.props;
-
-    if(cssCalendar == 'hideCalendar'){
-      this.props.changeCssCal('showCalendar');
-    }else if(cssCalendar == 'showCalendar'){
-      this.props.changeCssCal('hideCalendar');
-    }
-
-  }
-
 
   render() {
-    const { head,rows,progressNumber,date,selectValue,cssCalendar } = this.props;
-    const {articolo,lotto,quantita,value} = this.state;
+    const { head,rows,progressNumber,date,selectValue} = this.props;
+    const {lotto,quantita,value} = this.state;
 
     // Autosuggest will pass through all these props to the input.
     const inputProps = {
@@ -214,73 +208,139 @@ class Main extends React.Component {
       onChange: this.onChange
     };
 
-    //
-
     return (
-      <div className="view">
-        <div className="head">
+      <Container fluid>
+        <Container className="head" fluid>
           <span>{head}</span>
-        </div>
+        </Container>
         <br />
-        <div className="form">
-          <table>
-            <tr>
-              <td>
-                <select
-                  value={selectValue}
-                  onChange={this.handleChange}
-                >
-                  <option>Fattura</option>
-                  <option>Ordine</option>
-                  <option>Carico</option>
-                  <option>Scarico</option>
-                </select>
-              </td>
-              <td>
-                <input type="text" value={"Numero Progressivo: "+progressNumber} className="input" placeholder="codice Lotto" readOnly />
-              </td>
-              <td>
-                <div className="calendar">
-                  <p className={cssCalendar}><Calendar onChange={this.onChange2}/></p>
-                  <input type="text" className="input" placeholder="Data yyyy/mm/gg" value={date} onChange={this.dataChange}/>
-                  <img src={require('./calendar.png')} onClick={this.showHideCalendar}/>
-                </div>
-              </td>
-              <td>
-                
-              </td>
-            </tr>
-            <tr className="exampleRow">
-              <td><Autosuggest
+          <Container className="form" fluid>
+            <Row bsPrefix="headRow">
+              <Col lg="auto">
+                <p>INVOICE INFORMATION </p> 
+              </Col>
+              {/*<Col>
+                <Button bsPrefix="headButton" variant="outline-light">-</Button>
+              </Col>*/}
+            </Row>
+            <Row>
+              <Col lg>
+                <Form.Group controlId="invoiceSelect">
+                    <Form.Control as="select" value={selectValue} onChange={this.handleChange}>
+                      <option>Fattura</option>
+                      <option>Ordine</option>
+                      <option>Carico</option>
+                      <option>Scarico</option>
+                    </Form.Control>
+                  </Form.Group>
+              </Col>
+              <Col lg>
+                <InputGroup>
+                  <InputGroup.Prepend>
+                    <InputGroup.Text id="progNumber">Numero Progressivo:</InputGroup.Text>
+                  </InputGroup.Prepend>
+                  <FormControl
+                    readOnly
+                    value={progressNumber}
+                    aria-label="progressNumber"
+                    aria-describedby="progNumber"
+                  />
+                </InputGroup>
+              </Col>
+              <Col lg>
+                <InputGroup>
+                  <InputGroup.Prepend /*ref={this.setWrapperRef}*/>
+                    <InputGroup.Text id="image">
+                      <OverlayTrigger rootClose={true} trigger="click" placement="bottom" overlay={<Tooltip id="calendar" bsPrefix="calendarSize"><Calendar onChange={this.onChange2}/></Tooltip>}>
+                        <Image className="image" src={require('./calendar.png')} onClick={this.showCalendar}/>
+                      </OverlayTrigger>
+                    </InputGroup.Text>
+                  </InputGroup.Prepend>
+                  <FormControl
+                    readOnly
+                    value={date}
+                    onChange={this.dataChange}
+                    aria-label="progressNumber"
+                    aria-describedby="progNumber"
+                  />
+                </InputGroup>
+              </Col>
+            </Row>
+            <br />
+            <Row bsPrefix="headRow">
+              <Col lg="auto" >
+                <p>INVOICE FORM</p>
+              </Col>
+            </Row>
+            <Row>
+              <Col lg>
+                <Autosuggest
                     suggestions={this.props.suggArticles}
-                    //suggestions={suggestions}
                     //onSuggestionsFetchRequested={this.onSuggestionsFetchRequested}
                     onSuggestionsClearRequested={this.onSuggestionsClearRequested}
                     getSuggestionValue={getSuggestionValue}
                     renderSuggestion={renderSuggestion}
-                    inputProps={inputProps} 
+                    inputProps={inputProps}
+                />
+              </Col>
+              <Col lg>
+                <InputGroup>
+                  <InputGroup.Prepend>
+                    <InputGroup.Text id="lotto">Lotto:</InputGroup.Text>
+                  </InputGroup.Prepend>
+                  <FormControl
+                    value={lotto}
+                    onChange={(e)=>this.valueChange(e,"lotto")}
+                    aria-label="lottoCode"
+                    aria-describedby="lotto"
                   />
-              </td>
-              <td><input type="text" placeholder="codice Lotto" className="input" value={lotto} onChange={(e)=>this.valueChange(e,"lotto")}/></td>
-              <td><input type="number" placeholder="quantita" className="input" value={quantita} onChange={(e)=>this.valueChange(e,"quantita")}/></td>
-              <td><button type="button" className="Button" onClick={this.addCheckRow}>Aggiungi Riga</button></td>
-            </tr>
+                </InputGroup>
+              </Col>
+              <Col lg>
+              <InputGroup>
+                  <InputGroup.Prepend>
+                    <InputGroup.Text id="quantita">Quantita:</InputGroup.Text>
+                  </InputGroup.Prepend>
+                  <FormControl
+                    value={quantita}
+                    onChange={(e)=>this.valueChange(e,"quantita")}
+                    aria-label="quantitaNum"
+                    aria-describedby="quantita"
+                  />
+              </InputGroup>
+              </Col>
+              <Col lg>
+                <Button variant="secondary" block onClick={this.addCheckRow}>ADD ROW</Button>
+              </Col>
+            </Row>
+            <br />
+            <Row bsPrefix="headRow">
+              <Col lg >
+                <p>INVOICE ROWS</p>
+              </Col>
+            </Row>
             {rows.map((row, index) => (
-            <tr className="rows">
-               <Row index={index} articolo={row.idArticolo} lotto={row.idLotto} quantita={row.quantita} upRow={this.updateRow}/>
-               <td>
-                  <button className="Button" onClick={() =>this.deleteRow(index)}>Elimina Riga</button>
-                  <button className="Button" onClick={() =>this.updateRow(index)}>Modifica Riga</button>
-               </td>
-            </tr>
+              <>
+              <Row>
+                <Line index={index} articolo={row.idArticolo} lotto={row.idLotto} quantita={row.quantita} upRow={this.updateRow}/>
+                <Col lg>
+                  <ButtonGroup aria-label="ButtonRow">
+                    <Button variant="secondary" onClick={() =>this.deleteRow(index)}>Delete Row</Button>
+                    <Button variant="secondary" onClick={() =>this.updateRow(index)}>Update Row</Button>
+                  </ButtonGroup>
+                </Col>
+              </Row>
+              <br />
+              </>
             ))}
-          </table>
+          </Container>
           <br />
-        </div>
-        <div className="footer">
-          <input type="submit" value="INVIA" className="Button" onClick={this.sentToDB} />
-        </div>
-      </div>
+
+        <Container className="footer" fluid>
+          <Button variant="secondary" size="lg" block onClick={this.sentToDB}>SEND</Button>
+        </Container>
+
+      </Container>
     );
   }
 }
@@ -291,7 +351,6 @@ const mapStateToProps = (state) => {
     progressNumber: state.progressNumber,
     selectValue: state.selectValue,
     date: state.date,
-    cssCalendar: state.cssCalendar,
     suggArticles:state.suggArticles,
   }
 }
@@ -304,7 +363,6 @@ const mapDispatchToProps = (dispatch) => {
     clearRows: () =>{dispatch(clearRows())},
     delRow: (idRow) => {dispatch(delRow(idRow))},
     changeDate: (date) => dispatch(changeDate(date)),
-    changeCssCal : (cssCalendar) => dispatch(changeCssCal(cssCalendar)),
     setSuggArticles : (articles) => dispatch(setSuggArticles(articles)),
     setRows : (newRows) => dispatch(setRows(newRows)),
     updateRow :(articolo,lotto,quantita,index) => dispatch(updateRow(articolo,lotto,quantita,index)),

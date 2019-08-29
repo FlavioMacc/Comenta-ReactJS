@@ -1,11 +1,8 @@
-//const DATE_OPTIONS = {day: 'numeric', month: 'numeric', year: 'numeric'};
-
 const initialState = {
   rows:[],
   progressNumber: 0,
   selectValue: 'fattura',
   date: (new Date()).toLocaleDateString( window.userLang , {day: 'numeric', month: 'numeric', year: 'numeric'}),
-  cssCalendar:'hideCalendar',
 
   suggArticles:[{id: 0, codice: "loading", descrizione: "0"}],
 };
@@ -70,14 +67,6 @@ function rootReducer(state = initialState, action) {
     }
   }
 
-  if(action.type === 'UPDATE_CSS_CAL'){
-    let newCssCalendar = action.cssCalendar; 
-    return{
-      ...state,
-      cssCalendar:newCssCalendar
-    }
-  }
-
   if(action.type === 'SET_SUGG_ART'){
     let newSuggArticles = action.articles; 
     return{
@@ -96,6 +85,5 @@ function rootReducer(state = initialState, action) {
 
   return state;
 }
-
 
 export default rootReducer;

@@ -1,7 +1,7 @@
 html, body {
     height: 100%;
     width: 100%;
-    background: rgb(181, 230, 247);
+    background: #819ca9;
   }
 
 span{
@@ -9,104 +9,42 @@ span{
     vertical-align: middle;
 }
 
-table{
-    width: 100%;
-}
-
-tr{
-    width: 100%;
-}
-
-td{
-    width: 25%;
-    padding: 20px;
-}
-
-select{
-  width: 240px;
-  height: 30px;
-  font-size: 16px;
-  border-radius: 4px;
-  text-align-last: center;
-}
-
-
-tr.rows:hover {background-color:#929292;}
-
-tr.exampleRow{
-    background:rgb(2, 162, 255);
-}
-
-tr.exampleRow input{
-
-    font-size: 20px;
-    text-align-last: center;
-}
-
-.view{
-    height: 100%;
+.headRow{
+  background-color: #29434e;
+  color: snow;
+  font-size: 30px;
+  text-align: start;
 }
 
 .head{
-    width: 100%;
-    height: 25%;
-    background-color: rgb(158, 155, 155);
+    background-color: #29434e;
     text-align: center;
-    position: relative;
 }
 
 .form{
     width: 100%;
-    height: 50%;
-    background-color: rgb(158, 155, 155);
-    position: relative;
+    text-align: center;
 }
 
 .footer{
   text-align: center;
+  width: 33.3%;
 }
 
-.calendar img{
-  height: 30px;
-  width: auto;
+.image{
+  height: 20px;
 }
 
-.calendar .showCalendar{
-  position: absolute;
-  top: 25%;
-  left: 50%;
+.headButton{
+  background-color: unset;
+  border: none;
+  color: snow;
+  font-size: 30px;
+  text-align: end;
 }
 
-.calendar .hideCalendar{
-  display: none;
-  position: absolute;
-  top: 25%;
-  left: 50%;
-}
-
-.input{
-  width: 240px;
-  height: 30px;
-  padding: 10px 20px;
-  font-family: Helvetica, sans-serif;
-  font-weight: 300;
-  font-size: 16px;
-  border: 1px solid #aaa;
-  border-radius: 4px;
-}
-
-.Button{
-  width: 240px;
-  height: 30px;
-  background: #fff;
-  border-radius: 4px;
-}
-
-tr.rows .Button{
-  width: 120px;
-  height: 30px;
-  background: #fff;
-  border-radius: 4px;
+.calendarSize{
+  
 }
 
 .react-autosuggest__container {

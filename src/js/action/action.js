@@ -51,13 +51,6 @@ export const changeDate = (date) => {
     }
 }
 
-export const changeCssCal = (cssCalendar) => {
-    return {
-        type:'UPDATE_CSS_CAL',
-        cssCalendar
-    }
-}
-
 export const setSuggArticles = (articles) => {
     return {
         type:'SET_SUGG_ART',

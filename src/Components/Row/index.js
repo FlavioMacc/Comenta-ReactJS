@@ -1,7 +1,11 @@
 import './row.css';
 import React from 'react';
 
-class Row extends React.Component {
+import Col from 'react-bootstrap/Col';
+import InputGroup from 'react-bootstrap/InputGroup';
+import FormControl from 'react-bootstrap/FormControl';
+
+class Line extends React.Component {
   constructor(props) {
     super(props);
 
@@ -16,13 +20,13 @@ class Row extends React.Component {
   onChange(event,nameVariable){
     const {index,articolo,lotto,quantita} = this.state;
     let row;
-    if(nameVariable == 'articolo'){
+    if(nameVariable === 'articolo'){
       this.setState({ articolo: event.target.value });
       row=[event.target.value,lotto,quantita,index];
-    }else if(nameVariable == 'lotto'){
+    }else if(nameVariable === 'lotto'){
       this.setState({ lotto: event.target.value });
       row=[articolo,event.target.value,quantita,index];
-    }else if(nameVariable == 'quantita'){
+    }else if(nameVariable === 'quantita'){
       this.setState({ quantita: event.target.value });
       row=[articolo,lotto,event.target.value,index];
     }
@@ -34,21 +38,50 @@ class Row extends React.Component {
     const {articolo,lotto,quantita} = this.state; 
     return (
       <>
-        <td>
-          codice Articolo:
-          <input type="text" name="articolo" value={articolo} onChange={(e) =>this.onChange(e,"articolo")} />
-        </td>
-        <td>
-          codice Lotto:
-          <input type="text" name="lotto" value={lotto} onChange={(e) =>this.onChange(e,"lotto")}/>
-        </td>
-        <td>
-          quantita:
-          <input type="number" name="quantita" value={quantita} onChange={(e) =>this.onChange(e,"quantita")}/>
-        </td>
+        <Col lg>
+          <InputGroup>
+            <InputGroup.Prepend>
+              <InputGroup.Text id="basic-addon1">Articolo:</InputGroup.Text>
+            </InputGroup.Prepend>
+            <FormControl
+              value={articolo}
+              onChange={(e) =>this.onChange(e,"articolo")}
+              aria-label="articolo"
+              aria-describedby="basic-addon1"
+            />
+            </InputGroup>
+        </Col>
+
+        <Col lg>
+          <InputGroup>
+            <InputGroup.Prepend>
+              <InputGroup.Text id="basic-addon1">Lotto:</InputGroup.Text>
+            </InputGroup.Prepend>
+            <FormControl
+              value={lotto}
+              onChange={(e) =>this.onChange(e,"lotto")}
+              aria-label="articolo"
+              aria-describedby="basic-addon1"
+            />
+            </InputGroup>
+        </Col>
+
+        <Col lg>
+          <InputGroup>
+            <InputGroup.Prepend>
+              <InputGroup.Text id="basic-addon1">Quantita:</InputGroup.Text>
+            </InputGroup.Prepend>
+            <FormControl
+              value={quantita} 
+              onChange={(e) =>this.onChange(e,"quantita")}
+              aria-label="articolo"
+              aria-describedby="basic-addon1"
+            />
+            </InputGroup>
+        </Col>
       </>
     );
   }
 }
 
-export default Row;
+export default Line;
